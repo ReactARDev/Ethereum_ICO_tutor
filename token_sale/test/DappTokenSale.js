@@ -62,4 +62,33 @@ contract('DappTokenSale', function(accounts) {
 			assert(error.message.indexOf('revert') >= 0, 'can not percharge than available');
 		});
 	});
-});
+
+	it('end token sale', function(){
+		return DappToken.deployed().then(function(instance){
+			// Grab token instance first
+			tokenInstance = instance;
+			return DappTokenSale.deployed();
+		}).then(function(instance){
+			// Grab tokensale instance second
+			tokenSaleInstance = instance;
+			// Try to end sale from account other than admin 
+			return tokenSaleInstance.endSale({ from: buyer });
+		}).then(assert.fail).catch(function(error){
+			assert(error.message.indexOf('revert') >= 0, 'must be admin to endSale')
+			// End sale as a admin
+			return tokenSaleInstance.endSale({ from: admin });
+		}).then(function(receipt) {
+			// receipt token balance
+			return tokenInstance.balanceOf(admin);
+		}).then(function(balance) {
+			assert.equal(balance.toNumber(), 999990, 'returns all unsold dapp token to admin');
+			// Check that the contract has no balance
+       		balance = web3.eth.getBalance(tokenSaleInstance.address)
+        	assert.equal(balance.toNumber(), 0);
+			// Check than token price was reset when sefldestruct was called
+		// 	return tokenSaleInstance.tokenPrice()
+		// }).then(function(price) {
+		// 	assert.equal(price.toNumber(), 0, 'token price was reset')
+		});
+	});
+});	

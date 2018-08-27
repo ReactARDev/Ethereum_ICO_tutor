@@ -1,0 +1,7 @@
+# How it works.
+
+##  Provision tokens to token sale contract
+##  Set a token price in WEI
+##	Assign an admin
+##	Buy tokens
+##	End sale
